@@ -131,7 +131,3 @@ The project uses a monorepo structure with:
 - `/src` - React frontend
 - `/api` - Node.js backend
 - Shared configuration and dependencies
-
-## 📝 License
-
-This project is for demonstration purposes as part of an AI Developer Test.
