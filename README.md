@@ -38,7 +38,7 @@ This is an enhanced e-commerce platform featuring **AI-powered smart product sea
 ### Smart Product Search (NLP)
 
 - **Natural Language Processing**: Users can search using conversational queries
-- **Price Filtering**: "under $50", "over $100", "cheap", "expensive"
+- **Price Filtering**: "higher 50$", "under $50", "over $100", "cheap", "expensive"
 - **Category Recognition**: "electronics", "shoes", "jewelry", "clothing"
 - **Rating Filtering**: "good reviews", "high rating"
 - **Semantic Search**: Understands context and intent
