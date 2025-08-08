@@ -55,8 +55,8 @@
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node ./api/server.js",
-    "client": "react-scripts --openssl-legacy-provider start",
+    "server": "PORT=4001 node ./api/server.js",
+    "client": "PORT=3000 react-scripts --openssl-legacy-provider start",
     "build": "react-scripts --openssl-legacy-provider build",
     "test": "react-scripts eject",
     "eject": "react-scripts eject"

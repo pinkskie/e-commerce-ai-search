@@ -5,7 +5,7 @@ import { KEYWORD_MAPPINGS, PRICE_PATTERNS } from "../lib";
 
 import "./AISearch.css";
 
-const AISearch = ({ onSearchResults, products, loading }) => {
+const AISearch = ({ onSearchResults, products }) => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 

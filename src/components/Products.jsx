@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
@@ -48,7 +48,7 @@ const Products = () => {
   const Loading = () => {
     return (
       <>
-        <div className="col-12 py-5 text-center">
+        <div className="col-12 pb-4 pt-2 text-center">
           <Skeleton height={40} width={560} />
         </div>
         <div className="col-md-4 col-sm-6 col-xs-8 col-12 mb-4">
@@ -80,12 +80,12 @@ const Products = () => {
     setAiSearchQuery("");
   };
 
-  const handleAISearchResults = (results, query) => {
+  const handleAISearchResults = useCallback((results, query) => {
     setFilter(results);
     setAiSearchActive(true);
     setAiSearchQuery(query);
     toast.success(`AI found ${results.length} products for: "${query}"`);
-  };
+  }, []);
 
   const clearAISearch = () => {
     setFilter(data);
@@ -96,11 +96,7 @@ const Products = () => {
   const ShowProducts = () => {
     return (
       <>
-        <AISearch
-          onSearchResults={handleAISearchResults}
-          products={data}
-          loading={loading}
-        />
+        <AISearch onSearchResults={handleAISearchResults} products={data} />
 
         {aiSearchActive && (
           <div className="alert alert-info text-center mb-4">
@@ -212,12 +208,9 @@ const Products = () => {
     <div className="container my-3 py-3">
       <div className="row">
         <div className="col-12">
-          <h2 className="display-5 text-center">
+          <h2 className="display-5 text-center ">
             🛍️ AI-Enhanced Product Catalog
           </h2>
-          <p className="text-center text-muted">
-            Use natural language to find exactly what you're looking for!
-          </p>
         </div>
       </div>
       <div className="row justify-content-center">
