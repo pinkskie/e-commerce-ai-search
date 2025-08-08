@@ -1,11 +1,153 @@
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 
+import { KEYWORD_MAPPINGS, PRICE_PATTERNS } from "../lib";
+
 import "./AISearch.css";
 
 const AISearch = ({ onSearchResults, products, loading }) => {
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  // Enhanced price extraction with better regex
+  const extractPriceRange = (query) => {
+    for (const pattern of PRICE_PATTERNS) {
+      const match = query.match(pattern);
+      if (match) {
+        const price = parseFloat(match[1] || "0");
+        if (
+          pattern.source.includes("under") ||
+          pattern.source.includes("cheap")
+        ) {
+          return { type: "max", value: price };
+        } else if (
+          pattern.source.includes("over") ||
+          pattern.source.includes("expensive") ||
+          pattern.source.includes("higher")
+        ) {
+          return { type: "min", value: price };
+        }
+      }
+    }
+    return null;
+  };
+
+  // Enhanced category detection
+  const detectCategory = (query) => {
+    const detectedCategories = [];
+
+    Object.entries(KEYWORD_MAPPINGS.categories).forEach(
+      ([category, keywords]) => {
+        if (keywords.some((keyword) => query.toLowerCase().includes(keyword))) {
+          detectedCategories.push(category);
+        }
+      }
+    );
+
+    return detectedCategories;
+  };
+
+  // Enhanced attribute detection
+  const detectAttributes = (query) => {
+    const detectedAttributes = [];
+
+    Object.entries(KEYWORD_MAPPINGS.attributes).forEach(
+      ([attribute, keywords]) => {
+        if (keywords.some((keyword) => query.toLowerCase().includes(keyword))) {
+          detectedAttributes.push(attribute);
+        }
+      }
+    );
+
+    return detectedAttributes;
+  };
+
+  // Enhanced quality detection
+  const detectQuality = (query) => {
+    const lowerQuery = query.toLowerCase();
+
+    if (
+      KEYWORD_MAPPINGS.quality.good.some((keyword) =>
+        lowerQuery.includes(keyword)
+      )
+    ) {
+      return "high";
+    } else if (
+      KEYWORD_MAPPINGS.quality.cheap.some((keyword) =>
+        lowerQuery.includes(keyword)
+      )
+    ) {
+      return "low";
+    } else if (
+      KEYWORD_MAPPINGS.quality.luxury.some((keyword) =>
+        lowerQuery.includes(keyword)
+      )
+    ) {
+      return "luxury";
+    }
+
+    // Special handling for "higher" queries
+    if (lowerQuery.includes("higher")) {
+      return "luxury"; // Treat "higher" as luxury/premium
+    }
+
+    return null;
+  };
+
+  // Enhanced product scoring based on query relevance
+  const calculateProductScore = (
+    product,
+    query,
+    detectedCategories,
+    detectedAttributes,
+    quality
+  ) => {
+    let score = 0;
+    const lowerQuery = query.toLowerCase();
+    const lowerTitle = product.title.toLowerCase();
+    const lowerDescription = (product.description || "").toLowerCase();
+    const lowerCategory = product.category.toLowerCase();
+
+    // Category matching
+    if (detectedCategories.length > 0) {
+      if (detectedCategories.some((cat) => lowerCategory.includes(cat))) {
+        score += 10;
+      }
+    }
+
+    // Title matching
+    if (lowerTitle.includes(lowerQuery)) {
+      score += 8;
+    }
+
+    // Description matching
+    if (lowerDescription.includes(lowerQuery)) {
+      score += 5;
+    }
+
+    // Attribute matching
+    detectedAttributes.forEach((attr) => {
+      if (lowerTitle.includes(attr) || lowerDescription.includes(attr)) {
+        score += 3;
+      }
+    });
+
+    // Quality matching
+    if (quality === "high" && product.rating && product.rating.rate >= 4.0) {
+      score += 4;
+    } else if (quality === "low" && product.price < 50) {
+      score += 4;
+    } else if (quality === "luxury" && product.price > 100) {
+      score += 4;
+    }
+
+    // Rating boost
+    if (product.rating && product.rating.rate >= 4.5) {
+      score += 2;
+    }
+
+    return score;
+  };
 
   const searchWithAI = async (naturalQuery) => {
     setIsLoading(true);
@@ -14,89 +156,72 @@ const AISearch = ({ onSearchResults, products, loading }) => {
       // Simulate AI processing
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Parse natural language query
-      const lowerQuery = naturalQuery.toLowerCase();
-
       let filteredProducts = [...products];
 
-      // Price filtering
-      if (lowerQuery.includes("under") || lowerQuery.includes("less than")) {
-        const priceMatch = lowerQuery.match(/(\d+)/);
-        if (priceMatch) {
-          const maxPrice = parseFloat(priceMatch[1]);
+      // Extract price range
+      const priceRange = extractPriceRange(naturalQuery);
+      if (priceRange) {
+        if (priceRange.type === "max") {
           filteredProducts = filteredProducts.filter(
-            (product) => product.price <= maxPrice
+            (product) => product.price <= priceRange.value
+          );
+        } else {
+          filteredProducts = filteredProducts.filter(
+            (product) => product.price >= priceRange.value
           );
         }
       }
 
-      if (lowerQuery.includes("over") || lowerQuery.includes("more than")) {
-        const priceMatch = lowerQuery.match(/(\d+)/);
-        if (priceMatch) {
-          const minPrice = parseFloat(priceMatch[1]);
-          filteredProducts = filteredProducts.filter(
-            (product) => product.price >= minPrice
-          );
-        }
-      }
+      // Detect categories
+      const detectedCategories = detectCategory(naturalQuery);
 
-      // Category filtering
-      if (lowerQuery.includes("shoes") || lowerQuery.includes("footwear")) {
-        filteredProducts = filteredProducts.filter(
-          (product) =>
-            product.title.toLowerCase().includes("shoes") ||
-            product.category.toLowerCase().includes("clothing")
-        );
-      }
+      // Detect attributes
+      const detectedAttributes = detectAttributes(naturalQuery);
 
-      if (lowerQuery.includes("electronics") || lowerQuery.includes("tech")) {
+      // Detect quality preferences
+      const quality = detectQuality(naturalQuery);
+
+      // Apply category filtering if categories detected
+      if (detectedCategories.length > 0) {
         filteredProducts = filteredProducts.filter((product) =>
-          product.category.toLowerCase().includes("electronics")
+          detectedCategories.some(
+            (cat) =>
+              product.category.toLowerCase().includes(cat) ||
+              product.title.toLowerCase().includes(cat)
+          )
         );
       }
 
-      if (lowerQuery.includes("jewelry") || lowerQuery.includes("jewelery")) {
-        filteredProducts = filteredProducts.filter((product) =>
-          product.category.toLowerCase().includes("jewelery")
-        );
-      }
-
-      // Rating filtering
+      // Apply rating filtering
       if (
-        lowerQuery.includes("good reviews") ||
-        lowerQuery.includes("high rating")
+        naturalQuery.toLowerCase().includes("good reviews") ||
+        naturalQuery.toLowerCase().includes("high rating") ||
+        quality === "high"
       ) {
         filteredProducts = filteredProducts.filter(
           (product) => product.rating && product.rating.rate >= 4.0
         );
       }
 
-      // General search terms
-      const searchTerms = [
-        "running",
-        "comfortable",
-        "stylish",
-        "cheap",
-        "expensive",
-      ];
-      searchTerms.forEach((term) => {
-        if (lowerQuery.includes(term)) {
-          filteredProducts = filteredProducts.filter(
-            (product) =>
-              product.title.toLowerCase().includes(term) ||
-              product.description.toLowerCase().includes(term)
-          );
-        }
-      });
-
-      // If no specific filters applied, do general search
+      // If no specific filters applied, do semantic search
       if (filteredProducts.length === products.length) {
-        filteredProducts = products.filter(
-          (product) =>
-            product.title.toLowerCase().includes(lowerQuery) ||
-            product.description.toLowerCase().includes(lowerQuery) ||
-            product.category.toLowerCase().includes(lowerQuery)
-        );
+        // Calculate relevance scores for all products
+        const scoredProducts = products.map((product) => ({
+          ...product,
+          relevanceScore: calculateProductScore(
+            product,
+            naturalQuery,
+            detectedCategories,
+            detectedAttributes,
+            quality
+          ),
+        }));
+
+        // Filter by minimum relevance score and sort by score
+        filteredProducts = scoredProducts
+          .filter((product) => product.relevanceScore > 0)
+          .sort((a, b) => b.relevanceScore - a.relevanceScore)
+          .map(({ relevanceScore, ...product }) => product);
       }
 
       setIsLoading(false);
@@ -159,8 +284,8 @@ const AISearch = ({ onSearchResults, products, loading }) => {
 
           <div className="mt-3">
             <small className="text-muted">
-              <strong>Examples:</strong> "electronics under $50", "women's
-              clothing with good reviews", "cheap running shoes"
+              <strong>Examples:</strong> "comfortable running shoes under $80",
+              "luxury electronics with good reviews", "cheap stylish clothing"
             </small>
           </div>
         </div>
