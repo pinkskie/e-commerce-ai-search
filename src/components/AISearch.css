@@ -1,0 +1,114 @@
+.ai-search-container {
+  margin-bottom: 2rem;
+}
+
+.ai-search-container .card {
+  border: 2px solid #e9ecef;
+  border-radius: 15px;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.ai-search-container .card-title {
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.ai-search-container .input-group {
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.ai-search-container .form-control {
+  border: none;
+  padding: 12px 16px;
+  font-size: 16px;
+}
+
+.ai-search-container .form-control:focus {
+  box-shadow: none;
+  border-color: #007bff;
+}
+
+.ai-search-container .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.ai-search-container .btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+.ai-search-container .btn-primary:disabled {
+  background: #6c757d;
+  transform: none;
+}
+
+.ai-search-container .spinner-border {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Alert styling for AI search results */
+.alert-info {
+  background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+  border: 1px solid #bee5eb;
+  border-radius: 10px;
+  color: #0c5460;
+}
+
+.alert-info .btn-outline-info {
+  border-color: #17a2b8;
+  color: #17a2b8;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.alert-info .btn-outline-info:hover {
+  background-color: #17a2b8;
+  border-color: #17a2b8;
+  color: white;
+}
+
+/* Product card enhancements */
+.card {
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.card-img-top {
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+/* Rating stars */
+.rating-stars {
+  color: #ffc107;
+  font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .ai-search-container .card-body {
+    padding: 1rem;
+  }
+
+  .ai-search-container .input-group {
+    flex-direction: column;
+  }
+
+  .ai-search-container .btn-primary {
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+}

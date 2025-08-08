@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import Skeleton from "react-loading-skeleton";
 import { Link, useParams } from "react-router-dom";
 import Marquee from "react-fast-marquee";
-import { useDispatch } from "react-redux";
-import { addCart } from "../redux/action";
 
-import { Footer, Navbar } from "../components";
+import { addCart } from "../redux/action";
+import { Navbar } from "../components";
 
 const Product = () => {
   const { id } = useParams();
@@ -175,18 +175,13 @@ const Product = () => {
         <div className="row">{loading ? <Loading /> : <ShowProduct />}</div>
         <div className="row my-5 py-5">
           <div className="d-none d-md-block">
-          <h2 className="">You may also Like</h2>
-            <Marquee
-              pauseOnHover={true}
-              pauseOnClick={true}
-              speed={50}
-            >
+            <h2 className="">You may also Like</h2>
+            <Marquee pauseOnHover={true} pauseOnClick={true} speed={50}>
               {loading2 ? <Loading2 /> : <ShowSimilarProduct />}
             </Marquee>
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

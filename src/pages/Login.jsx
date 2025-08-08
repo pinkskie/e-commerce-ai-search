@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Footer, Navbar } from "../components";
+
+import { Navbar } from "../components";
 
 const Login = () => {
   return (
@@ -31,10 +32,22 @@ const Login = () => {
                 />
               </div>
               <div className="my-3">
-                <p>New Here? <Link to="/register" className="text-decoration-underline text-info">Register</Link> </p>
+                <p>
+                  New Here?{" "}
+                  <Link
+                    to="/register"
+                    className="text-decoration-underline text-info"
+                  >
+                    Register
+                  </Link>{" "}
+                </p>
               </div>
               <div className="text-center">
-                <button class="my-2 mx-auto btn btn-dark" type="submit" disabled>
+                <button
+                  class="my-2 mx-auto btn btn-dark"
+                  type="submit"
+                  disabled
+                >
                   Login
                 </button>
               </div>
@@ -42,7 +55,6 @@ const Login = () => {
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
